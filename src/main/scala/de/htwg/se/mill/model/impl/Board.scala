@@ -103,18 +103,17 @@ object Board {
           "Invalid board size. Should be uneven and greater than 2 and less than 10."
         )
       )
+
+    val fields = (0 until size).flatMap { ring =>
+      (0 until size).flatMap { row =>
+        (0 until size).filterNot { col =>
+          row > 0 && row < size - 1 && col > 0 && col < size - 1
+        }.map(col => Field(col, row, ring))
+      }
+    }.toList
+  
     Success(
-      NewBoard(
-        // construct initial fields
-        (for {
-          ring <- 0 until size
-          row <- 0 until size
-          col <- 0 until size;
-          // filter out inner fields
-          if !(row > 0 && row < size - 1 && col > 0 && col < size - 1)
-        } yield Field(col, row, ring)).toList,
-        size
-      )
+      NewBoard(fields,size)
     )
   }
   def apply(fields: List[FieldInterface], size: Int): BoardInterface = {
