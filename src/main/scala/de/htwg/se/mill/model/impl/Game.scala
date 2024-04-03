@@ -42,8 +42,9 @@ case class Game(
         ^ Math.abs(from.ring - to.ring) == 1)
 
   def isMill(to: FieldInterface): Boolean = {
-    val possibleMillOnRow = countFields(to)(field => field.x == to.x)
-    val possibleMillOnColumn = countFields(to)(field => field.y == to.y)
+    def countFieldsTo = countFields(to);
+    val possibleMillOnRow = countFieldsTo(field => field.x == to.x)
+    val possibleMillOnColumn = countFieldsTo(field => field.y == to.y)
     val isMiddlePoint =
       to.x == Math.floor(board.size / 2) || to.y == Math.floor(
         board.size / 2
