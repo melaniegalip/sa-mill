@@ -111,7 +111,7 @@ object Board {
         }.map(col => Field(col, row, ring))
       }
     }.toList
-  
+
     Success(
       NewBoard(fields,size)
     )
