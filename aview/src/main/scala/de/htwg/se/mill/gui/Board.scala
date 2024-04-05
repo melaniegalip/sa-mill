@@ -1,0 +1,66 @@
+package aview.gui
+
+import scalafx.scene.layout.StackPane
+import scalafx.scene.layout.Background
+import scalafx.scene.layout.BackgroundImage
+import scalafx.scene.image.Image
+import scalafx.scene.layout.BackgroundRepeat
+import scalafx.scene.layout.BackgroundSize
+import scalafx.geometry.Side
+import scalafx.scene.layout.BackgroundPosition
+import model.FieldInterface
+import scalafx.geometry.Insets
+import scalafx.scene.shape.Rectangle
+import scalafx.scene.paint.Color
+import scalafx.scene.control.Label
+import scalafx.scene.control.ContentDisplay
+import scalafx.geometry.Pos
+import controller.ControllerInterface
+
+final case class Board(
+    val controller: ControllerInterface,
+    val onAction: (field: FieldInterface) => Unit
+) extends StackPane {
+  val currentPath = new java.io.File(".").getCanonicalPath
+  background = new Background(
+    Array(
+      new BackgroundImage(
+        new Image(currentPath + "\\aview\\src\\resources\\bg.jpg"),
+        BackgroundRepeat.NoRepeat,
+        BackgroundRepeat.NoRepeat,
+        new BackgroundPosition(
+          Side.Left,
+          0,
+          true,
+          Side.Bottom,
+          0,
+          true
+        ),
+        new BackgroundSize(
+          BackgroundSize.Auto,
+          BackgroundSize.Auto,
+          true,
+          true,
+          false,
+          true
+        )
+      )
+    )
+  )
+  children = Seq(
+    MessageBox(
+      s"${controller.gameState.get.game.currentPlayer}'s turn(${controller.currentGameState})"
+    )
+  ).appendedAll(
+    (0 until controller.gameState.get.game.board.size)
+      .map(n =>
+        new Ring(
+          controller.gameState.get.game.board.fields.filter(f => f.ring == n),
+          controller.gameState.get.game.board.size,
+          onAction,
+          n
+        )
+      )
+  )
+
+}
