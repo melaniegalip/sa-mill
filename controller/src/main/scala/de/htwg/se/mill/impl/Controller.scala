@@ -21,15 +21,33 @@ import model.PlayerInterface
 import model.GameInterface
 import com.google.inject.Inject
 import com.google.inject.Guice
-import model.FileIOInterface
+import persistence.FileIOInterface
 import util.Messages
 
-class Controller @Inject() (private val board: BoardInterface, private val fileIo: FileIOInterface)
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.model._
+import akka.http.scaladsl.server.Directives.*
+import scala.concurrent.ExecutionContextExecutor
+import scala.io.StdIn
+import play.api.libs.json.Json
+import scala.concurrent.Future
+import akka.http.scaladsl.unmarshalling.Unmarshal
+import akka.http.scaladsl.unmarshalling.{FromEntityUnmarshaller, Unmarshaller}
+import akka.http.scaladsl.marshalling.Marshaller
+
+import play.api.libs.json.{JsValue, Json}
+
+import java.io._
+
+class Controller @Inject() (private val board: BoardInterface)
     extends ControllerInterface {
   private val twoPlayers = new Array[PlayerInterface](2)
   private val winStrategy = WinStrategy.classicStrategy
   private var previousTurn: Option[Try[GameState]] = None
   private var undoCommand = new UndoCommand()
+  private val persistenceServer = "http://localhost:8080/persistence"
   var gameState: Option[GameState] = None
   var fromField: Option[FieldInterface] = None
 
@@ -158,6 +176,7 @@ class Controller @Inject() (private val board: BoardInterface, private val fileI
       )
     )
   }
+
   def currentGameState = gameState.get match {
     case FlyingState(game: GameInterface)   => "Flying Pieces"
     case MovingState(game: GameInterface)   => "Moving Pieces"
@@ -174,29 +193,53 @@ class Controller @Inject() (private val board: BoardInterface, private val fileI
 
   
   def save: Unit = {
-    try {
-        fileIo.save(previousTurn.get.get)
-        notifyObservers(
-          None,
-          Event.PLAY
+    implicit val system:ActorSystem[Any] = ActorSystem(Behaviors.empty, "my-system")
+
+    val executionContext: ExecutionContextExecutor = system.executionContext
+    given ExecutionContextExecutor = executionContext
+
+    
+    val save = Json.obj(
+      "gameState" -> Json.toJson(previousTurn.get.get.toJson)
+    )
+
+    val responseFuture: Future[HttpResponse] = Http().singleRequest(
+        HttpRequest(
+          method = HttpMethods.POST,
+          uri = persistenceServer + "/save",
+          entity = HttpEntity(ContentTypes.`application/json`, Json.prettyPrint(save).toString)
         )
-    } catch {
-      case e: Exception =>
-        notifyObservers(Some(Messages.gameStateCouldNotBeSaved), Event.PLAY)
-    }
+    )
   }
 
   def load: Unit = {
-    try {
-      doTurn(
-        Success(
-          fileIo.load
-        )
-      )
-    } catch {
-      case e: Exception =>
-        notifyObservers(Some(Messages.gameStateCouldNotBeLoaded), Event.PLAY)
-    }
+    implicit val system:ActorSystem[Any] = ActorSystem(Behaviors.empty, "my-system")
+
+    val executionContext: ExecutionContextExecutor = system.executionContext
+    given ExecutionContextExecutor = executionContext
+
+    val responseFuture: Future[HttpResponse] = Http().singleRequest(
+      HttpRequest(uri = persistenceServer + "/load"))
+
+    responseFuture
+      .onComplete {
+        case Failure(_) => sys.error("Failed getting Json")
+        case Success(value) => {
+          Unmarshal(value.entity).to[String].onComplete {
+            case Failure(_) => sys.error("Failed unmarshalling")
+            case Success(unmarshalledValue) => {
+              val json = Json.parse(unmarshalledValue)
+              Platform.runLater(
+                doTurn(
+                  Success(
+                    GameState.fromJson((json \ "gameState").get)
+                  )
+                )
+              )
+            }
+          }
+        }
+      }
   }
  
   private def doTurn(turn: Try[GameState]): Option[Throwable] = {

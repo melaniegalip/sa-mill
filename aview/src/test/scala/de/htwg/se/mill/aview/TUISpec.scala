@@ -16,14 +16,14 @@ import model.FlyingState
 import model.GameEvent
 import java.io.ByteArrayOutputStream
 import util.Messages
-import model.FileIOInterface
-import model.FileIOXml
+import persistence.FileIOInterface
+import persistence.FileIOJson
 
 class TUISpec extends AnyWordSpec with Matchers {
   "A new TUI" when {
     val melanie = Player("Melanie", "🔴")
     val reyhan = Player("Reyhan", "🔵")
-    val fileIo: FileIOInterface = FileIOXml
+    val fileIo: FileIOInterface = FileIOJson
     val controller = Controller(Board.withSize().get, fileIo)
     controller.addFirstPlayer(melanie.name)
     controller.addSecondPlayer(reyhan.name)

@@ -1,18 +1,18 @@
-package model
+package persistence
 
-import model.FileIOInterface
-import model.GameState
-import play.api.libs.json.Json
+import persistence.FileIOInterface
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import java.io.*
 import scala.io.Source
 import scala.xml.PrettyPrinter
+import model.GameState
 
 object FileIOJson extends FileIOInterface {
-  override def load: GameState = {
+  override def load: JsValue = {
     val source = Source.fromFile("gameState.json")
     val json = Json.parse(source.getLines().mkString)
     source.close()
-    GameState.fromJson((json \ "gameState").get)
+    json
   }
 
   override def save(gameState: GameState): Unit = {
