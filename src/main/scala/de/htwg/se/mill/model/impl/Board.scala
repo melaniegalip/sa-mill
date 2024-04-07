@@ -14,17 +14,22 @@ object Board {
     val barWidth = 4
     val spaceWidth = 3
 
-    override def getField(x: Int, y: Int, ring: Int): Option[FieldInterface] =
-      fields
-        .find(f =>
-          f.equals(
+    override def getField(x: Int, y: Int, ring: Int): Option[FieldInterface] = {
+      for {
+      field <- fields.find(f => f.equals(
             Field(
               x,
               y,
               ring
             )
-          )
-        )
+          ))
+    } yield field
+
+      getField(x,y,ring) match {
+        case Some(f) => Some(f)
+        case None => None
+      }
+    }
     override def equals(board: Any): Boolean = board match {
       case b: BoardInterface =>
         b.size.equals(size) && b.fields.equals(fields)
