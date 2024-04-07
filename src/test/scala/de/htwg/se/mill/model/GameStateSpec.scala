@@ -6,8 +6,8 @@
     class GameStateSpec extends AnyWordSpec with Matchers {
       "A new Game State" when {
         val board = Board.withSize().get
-        val melanie = Player("Melanie", "🔴")
-        val reyhan = Player("Reyhan", "🔵")
+        val melanie = Player("Melanie", "🔴"): PlayerInterface
+        val reyhan = Player("Reyhan", "🔵"): PlayerInterface
         val players = Array(melanie, reyhan)
         val game = Game(board, players, melanie)
         val firstField = Field(0, 0, 0)
