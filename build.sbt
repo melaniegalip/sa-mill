@@ -38,7 +38,7 @@ jacocoReportSettings := JacocoReportSettings(
 jacocoExcludes := Seq(
   "de.htwg.se.mill.Mill*",
   "de.htwg.se.mill.util*",
-  "de.htwg.se.mill.aview.gui*"
+  "de.htwg.se.mill.aview*",
 )
 
 
