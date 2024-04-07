@@ -42,14 +42,9 @@ case class Game(
         ^ Math.abs(from.ring - to.ring) == 1)
 
   def isMill(to: FieldInterface): Boolean = {
-    val possibleMillOnRow = board.fields
-      .count(field =>
-        field.y == to.y && field.ring == to.ring && field.color == currentPlayer.color
-      ) == board.size
-    val possibleMillOnColumn = board.fields
-      .count(field =>
-        field.x == to.x && field.ring == to.ring && field.color == currentPlayer.color
-      ) == board.size
+    def countFieldsTo = countFields(to);
+    val possibleMillOnRow = countFieldsTo(field => field.x == to.x)
+    val possibleMillOnColumn = countFieldsTo(field => field.y == to.y)
     val isMiddlePoint =
       to.x == Math.floor(board.size / 2) || to.y == Math.floor(
         board.size / 2
@@ -63,6 +58,14 @@ case class Game(
     }
     possibleMillOnColumn || possibleMillOnRow
   }
+
+  def countFields(to: FieldInterface)(condition: FieldInterface => Boolean): Boolean = {
+  board.fields
+    .count(field =>
+      condition(field) && field.ring == to.ring && field.color == currentPlayer.color
+    ) == board.size
+  }
+
   def everyPlayerHasSetItsStones =
     setStones == Math.pow(board.size, 2).toInt * players.length
   def copyStones(setStones: Int): GameInterface = copy(setStones = setStones)

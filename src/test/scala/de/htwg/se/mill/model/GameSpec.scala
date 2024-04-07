@@ -7,7 +7,7 @@ class GameSpec extends AnyWordSpec with Matchers {
   "A new Game" when {
     "created with a board and two players" should {
       val board = Board.withSize().get
-      val melanie = Player("Melanie", "🔴")
+      val melanie = Player("Melanie", "🔴"): PlayerInterface
       val players = Array(melanie, Player("Reyhan", "🔵"))
       val game = Game(board, players, melanie)
       "have the board" in {
@@ -44,8 +44,8 @@ class GameSpec extends AnyWordSpec with Matchers {
   }
   "A game" when {
     val board = Board.withSize().get
-    val melanie = Player("Melanie", "🔴")
-    val reyhan = Player("Reyhan", "🔵")
+    val melanie = Player("Melanie", "🔴"): PlayerInterface
+    val reyhan = Player("Reyhan", "🔵"): PlayerInterface
     val players = Array(melanie, reyhan)
     val game = Game(board, players, melanie)
     val firstField = Field(0, 0, 0)
