@@ -61,10 +61,7 @@ class Controller @Inject() (private val board: BoardInterface)
 
   def quit = notifyObservers(None, Event.QUIT)
 
-  private def createSnapshot: Snapshot = {
-    val snapshot = new Snapshot(this, previousTurn)
-    return snapshot
-  }
+  private def createSnapshot: Snapshot = new Snapshot(this, previousTurn)
 
   // Memento
   private class Snapshot(
