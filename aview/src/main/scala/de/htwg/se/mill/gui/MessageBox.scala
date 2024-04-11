@@ -9,7 +9,6 @@ import scalafx.scene.control.ContentDisplay
 import scalafx.scene.text.Font
 
 final case class MessageBox(message: String = "") extends StackPane {
-  val currentPath = new java.io.File(".").getCanonicalPath
   padding = Insets(20)
   children = List(
     new Rectangle {
@@ -21,7 +20,7 @@ final case class MessageBox(message: String = "") extends StackPane {
     new Label {
       text = message
       font = Font.loadFont(
-        "file:" + currentPath + "\\aview\\src\\resources\\OpenSansEmoji.ttf",
+        getClass().getResource("/OpenSansEmoji.ttf").toExternalForm(),
         20
       )
       contentDisplay = ContentDisplay.Center
