@@ -29,12 +29,16 @@ case class Game(
     case _ => false
   }
   def isValidSet(field: FieldInterface): Boolean =
-    field.x < board.size && field.x >= 0 && field.y < board.size
-      && field.y >= 0 && field.ring < board.size && field.ring >= 0
-      && board.fields
-        .find(f => f.equals(field))
-        .map(f => f.color == field.unsetFieldColor)
-        .getOrElse(false)
+    val validField: Boolean =
+    field.x < board.size && field.x >= 0 && field.y < board.size &&
+    field.y >= 0 && field.ring < board.size && field.ring >= 0
+
+    val unsetColor: Option[Boolean] = board.fields.find(_.equals(field)).map(f => f.color == field.unsetFieldColor)
+
+    (validField, unsetColor) match {
+    case (true, Some(bool)) => bool
+    case _ => false
+  }
 
   def isValidMove(from: FieldInterface, to: FieldInterface): Boolean =
     isValidSet(to) &&
