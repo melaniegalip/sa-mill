@@ -21,7 +21,7 @@ final case class MessageBox(message: String = "") extends StackPane {
     new Label {
       text = message
       font = Font.loadFont(
-        "file:" + currentPath + "\\aview\\src\\resources\\OpenSansEmoji.ttf",
+        getClass().getResource("/OpenSansEmoji.ttf").toExternalForm(),
         20
       )
       contentDisplay = ContentDisplay.Center

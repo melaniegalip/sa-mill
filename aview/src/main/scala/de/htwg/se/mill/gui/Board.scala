@@ -21,11 +21,10 @@ final case class Board(
     val controller: ControllerInterface,
     val onAction: (field: FieldInterface) => Unit
 ) extends StackPane {
-  val currentPath = new java.io.File(".").getCanonicalPath
   background = new Background(
     Array(
       new BackgroundImage(
-        new Image(currentPath + "\\aview\\src\\resources\\bg.jpg"),
+        new Image("bg.jpg"),
         BackgroundRepeat.NoRepeat,
         BackgroundRepeat.NoRepeat,
         new BackgroundPosition(
