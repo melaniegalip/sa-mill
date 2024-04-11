@@ -1,4 +1,4 @@
-val scala3Version = "3.2.2"
+val scala3Version = "3.3.3"
 val scalafxVersion = "18.0.1-R28"
 
 lazy val commonSettings = Seq(
@@ -81,8 +81,6 @@ lazy val aview = (project in file("aview"))
   )
 
 lazy val persistence = (project in file("persistence"))
-  .dependsOn(model)
-  .aggregate(model)
   .settings(
     name := "Mill-Persistence",
     commonSettings
