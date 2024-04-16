@@ -1,18 +1,11 @@
 package de.htwg.se.mill
 
-import model.Board
 import aview.TUI
-import scala.util.{Try, Success, Failure}
-import controller.Controller
 import aview.GUI
-import scala.io.StdIn.readLine
 import scalafx.application.Platform
-import model.BoardInterface
-import persistence.FileIOInterface
 import com.google.inject.Injector
 import com.google.inject.Guice
 import controller.ControllerInterface
-import javafx.embed.swing.JFXPanel
 
 object Mill {
   def main(args: Array[String]): Unit = {
@@ -20,15 +13,14 @@ object Mill {
     val controller = injector.getInstance(classOf[ControllerInterface])
     val tui = TUI(controller)
     // tui.start
-    new JFXPanel()
-    val gui = GUI(controller)
-    val guiThread = new Thread(() => {
-      gui.main(Array.empty)
-      System.exit(0)
-    })
-    guiThread.setDaemon(true)
-    guiThread.start()
+    Platform.startup(() => {
+      Platform.implicitExit_=(false);
+    });
 
-    tui.run
+    val gui = GUI(controller)
+
+    gui.main(Array())
+
+    // tui.run
   }
 }
