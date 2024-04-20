@@ -74,3 +74,9 @@ docker build -t mill:v1 .
 ```bash
 docker run -e DISPLAY=$ip:0 -v /tmp/.X11-unix:/tmp/.X11-unix -it mill:v1
 ```
+
+### Look at your database
+
+```bash
+docker exec -it database psql -U postgres tbl
+```
