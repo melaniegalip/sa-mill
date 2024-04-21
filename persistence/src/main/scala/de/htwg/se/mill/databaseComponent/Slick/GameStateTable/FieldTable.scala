@@ -3,7 +3,7 @@ package databaseComponent.Slick
 import slick.jdbc.PostgresProfile.api.*
 
 class FieldTable(tag: Tag) extends Table[(Int, Int, Int, Int, Int, String)](tag, "field") {
-    def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
+    def id = column[Int]("field_id", O.PrimaryKey, O.AutoInc)
     def boardId = column[Int]("board_id")
     def x = column[Int]("x")
     def y = column[Int]("y")

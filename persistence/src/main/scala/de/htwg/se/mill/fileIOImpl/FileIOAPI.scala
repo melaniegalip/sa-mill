@@ -17,6 +17,8 @@ import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success}
 
+import databaseComponent.Slick.*
+
 object FileIOAPI {
   private val routes: String =
     """
@@ -55,8 +57,10 @@ object FileIOAPI {
       concat(
         post {
           entity(as[String]) { game =>
+            val db: UserDAO = SlickUserDAO()
+            db.save(game)
+
             FileIOJson.save(
-              /*GameState.fromJson((Json.parse(game) \ "gameState").get) */
               game
             )
             complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "Game saved"))

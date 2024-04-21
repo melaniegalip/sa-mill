@@ -14,4 +14,6 @@ libraryDependencies ++= Seq(
   "org.postgresql" % "postgresql" % "42.6.0",
   "com.typesafe.slick" %% "slick-hikaricp" % "3.5.1",
   "org.slf4j" % "slf4j-nop" % "1.6.4",
+  ("com.typesafe.play" %% "play-json" % "2.8.2")
+      .cross(CrossVersion.for3Use2_13)
 )

@@ -13,6 +13,8 @@ import databaseComponent.Slick.*
 
 object Persistence {
   @main def main: Unit = {
+    val db = SlickUserDAO()
+    db.createTables()
 
     Try(FileIOAPI) match
       case Success(v) => println("Persistance Rest Server is running!")
@@ -21,9 +23,6 @@ object Persistence {
           "Persistance Server couldn't be started! " + v.getMessage + v.getCause
         )
 
-    val userDAO = SlickUserDAO()
-
-    Await.result(userDAO.createTables(), Duration.Inf)
-    userDAO.closeDatabase()
+    db.closeDatabase()
   }
 }

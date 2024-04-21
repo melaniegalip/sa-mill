@@ -3,7 +3,7 @@ package databaseComponent.Slick
 import slick.jdbc.PostgresProfile.api.*
 
 class GameTable(tag: Tag) extends Table[(Int, Int, Int, Int)](tag, "game") {
-    def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
+    def id = column[Int]("game_id", O.PrimaryKey, O.AutoInc)
     def boardId = column[Int]("board_id")
     def currentPlayerId = column[Int]("current_player_id")
     def setStones = column[Int]("set_stones")
