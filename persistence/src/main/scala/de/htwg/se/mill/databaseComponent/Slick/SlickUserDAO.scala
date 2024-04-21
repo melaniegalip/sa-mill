@@ -79,7 +79,7 @@ class SlickUserDAO extends UserDAO {
 
     def insertPlayer(name: String, color: String): Future[Int] = {
         val newPlayer = (0, name, color)
-        database.run((player returning player.map(_.id)) += newPlayer)
+        database.run((player returning player.map(_.playerId)) += newPlayer)
     }
 
     def insertPlayers(currentPlayerId: Int, players: Seq[JsValue]): Future[Unit] = {
@@ -104,7 +104,7 @@ class SlickUserDAO extends UserDAO {
 
     def insertBoard(size: Int): Future[Int] = {
         val newBoard = (0, size)
-        database.run((board returning board.map(_.id)) += newBoard)
+        database.run((board returning board.map(_.boardId)) += newBoard)
     }
 
     def insertGame(gameStateJson: String): Future[Int] = {
@@ -133,7 +133,7 @@ class SlickUserDAO extends UserDAO {
     }
 
     private def insertGameTable(boardId: Int, currentPlayerId: Int, setStones: Int): Future[Int] = {
-        database.run((game returning game.map(_.id)) += (0, boardId, currentPlayerId, setStones))
+        database.run((game returning game.map(_.gameId)) += (0, boardId, currentPlayerId, setStones))
     }
 
     def insertField(boardId: Int, fieldJson: String): Future[Int] = {
@@ -146,17 +146,80 @@ class SlickUserDAO extends UserDAO {
             val y = (data \ "y").asOpt[Int].getOrElse(0)
             val ring = (data \ "ring").asOpt[Int].getOrElse(0)
             val color = (data \ "color").asOpt[String].getOrElse("")
-            database.run((field returning field.map(_.id)) += (0, boardId, x, y, ring, color))
+            database.run((field returning field.map(_.fieldId)) += (0, boardId, x, y, ring, color))
         }
     }
 
     def insertGameState(gameStateType: String, gameId: Int): Future[Int] = {
-        database.run((gameState returning gameState.map(_.id)) += (0, gameStateType, gameId))
+        database.run((gameState returning gameState.map(_.gameStateId)) += (0, gameStateType, gameId))
     }
 
+    override def load(): Future[Option[String]] = {
 
-    override def load(): Unit = {
+        val gameInfoQuery = for {
+            gs <- gameState
+            g <- game if gs.gameId === g.gameId
+            b <- board if g.boardId === b.boardId
+            p <- player if g.currentPlayerId === p.playerId
+        } yield (gs.gameStateType, g.setStones, b.size, p.name, p.color)
 
+        val gameInfoResult = database.run(gameInfoQuery.result)
+
+        val playerGameQuery = for {
+            (player, game) <- player join game on (_.playerId =!= _.currentPlayerId)
+        } yield (player.name, player.color)
+
+        val playersResult = database.run(playerGameQuery.result)
+
+        val fieldQuery = for {
+                (((f, _), g), gs) <- field.join(board).on(_.boardId === _.boardId)
+                        .join(game).on(_._2.boardId === _.boardId)
+                        .join(gameState).on(_._2.gameId === _.gameId)
+        } yield (f.x, f.y, f.ring, f.color)
+
+        val fieldsResult = database.run(fieldQuery.result)
+
+        val combinedResult: Future[Option[String]] = for {
+            gameInfo <- gameInfoResult
+            players <- playersResult
+            fields <- fieldsResult
+        } yield {
+            val gameStateJson = gameInfo.map { case (gameStateType, setStones, boardSize, currentPlayerName, currentPlayerColor) =>
+                val fieldsJson = fields.map { case (x, y, ring, color) =>
+                    Json.obj(
+                        "x" -> x,
+                        "y" -> y,
+                        "ring" -> ring,
+                        "color" -> color
+                    )
+                }
+                val playersJson = players.map { case (name, color) =>
+                    Json.obj(
+                        "name" -> name,
+                        "color" -> color
+                    )
+                }
+                Json.obj(
+                    "gameState" -> Json.obj(
+                        "type" -> gameStateType,
+                        "game" -> Json.obj(
+                            "board" -> Json.obj(
+                                "fields" -> Json.toJson(fieldsJson),
+                                "size" -> boardSize
+                            ),
+                            "players" -> Json.toJson(playersJson),
+                            "currentPlayer" -> Json.obj(
+                                "name" -> currentPlayerName,
+                                "color" -> currentPlayerColor
+                            ),
+                            "setStones" -> setStones
+                        )
+                    )
+                )
+            }
+            gameStateJson.headOption.map(_.toString())
+        }
+        combinedResult
     }
 
     override def save(game: String): Future[Int] = {

@@ -20,6 +20,7 @@ import scala.util.{Failure, Success}
 import databaseComponent.Slick.*
 
 object FileIOAPI {
+
   private val routes: String =
     """
       Welcome to the REST Persistence API service!
@@ -40,6 +41,8 @@ object FileIOAPI {
   val executionContext: ExecutionContextExecutor = system.executionContext
   given ExecutionContextExecutor = executionContext
 
+
+
   val route = concat(
     path("persistence") {
       get {
@@ -48,18 +51,24 @@ object FileIOAPI {
     },
     path("persistence" / "load") {
       get {
-        complete(
-          HttpEntity(ContentTypes.`application/json`, FileIOJson.load)
-        )
+        val db = SlickUserDAO()
+        onSuccess(db.load()) { gameStateOpt =>
+          gameStateOpt match {
+            case Some(gameStateJson) =>
+              complete(HttpEntity(ContentTypes.`application/json`, FileIOJson.load(gameStateJson)))
+            case None =>
+              complete(StatusCodes.NotFound, "No game state found")
+          }
+        }
       }
     },
     path("persistence" / "save") {
       concat(
         post {
           entity(as[String]) { game =>
-            val db: UserDAO = SlickUserDAO()
+            val db = SlickUserDAO()
+            db.createTables()
             db.save(game)
-
             FileIOJson.save(
               game
             )
