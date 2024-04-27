@@ -1,7 +1,7 @@
+version: "3.9"
 services:
   db:
     image: postgres
-    restart: always
     container_name: database
     environment:
       POSTGRES_PASSWORD: postgres
@@ -11,28 +11,31 @@ services:
       POSTGRES_PORT: 5432
     ports:
         - "5432:5432"
-        
+    networks:
+      - my_network
+
   persistence:
-    image: mill-sa-persistence-image
-    build:
-      context: ./persistence/
-      dockerfile: ./Dockerfile
+    image: mill-persistence:0.1.0-SNAPSHOT
     ports:
       - "8081:8081"
-    stdin_open: true
     container_name: persistence-container
+    depends_on:
+      - db
+    volumes:
+      - ./persistence:/persistence
+    networks:
+      - my_network
     environment:
-      FILEIO_SERVICE_HOST: persistence
+      FILEIO_SERVICE_HOST: 0.0.0.0
       FILEIO_SERVICE_PORT: 8081
-    tty: true
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: tbl
+      POSTGRES_HOST: database
+      POSTGRES_PORT: 5432
 
   mill-sa:
-    image: mill-sa-image
-    build:
-      context: ./
-      dockerfile: ./Dockerfile
-    depends_on:
-      - "persistence"
+    image: mill:0.1.0-SNAPSHOT
     ports:
       - "8080:8080"
     stdin_open: true
@@ -40,8 +43,16 @@ services:
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - ~/.Xauthority:/root/.Xauthority
+      - .:/sa-mill
+    depends_on:
+      - persistence
+    networks:
+      - my_network
     environment:
-      FILEIO_SERVICE_HOST: persistence
+      FILEIO_SERVICE_HOST: 0.0.0.0
       FILEIO_SERVICE_PORT: 8081
       DISPLAY: $DISPLAY
     tty: true
+
+networks:
+  my_network:

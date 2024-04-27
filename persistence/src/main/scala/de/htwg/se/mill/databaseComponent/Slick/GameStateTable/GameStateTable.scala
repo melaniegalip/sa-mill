@@ -2,7 +2,8 @@ package databaseComponent.Slick
 
 import slick.jdbc.PostgresProfile.api.*
 
-class GameStateTable(tag: Tag) extends Table[(Int, String, Int)](tag, "game_state") {
+case class GameStateTable(tag: Tag)
+    extends Table[(Int, String, Int)](tag, "game_state") {
   def gameStateId = column[Int]("game_state_id", O.PrimaryKey, O.AutoInc)
   def gameStateType = column[String]("type")
   def gameId = column[Int]("game_id")
@@ -14,5 +15,5 @@ class GameStateTable(tag: Tag) extends Table[(Int, String, Int)](tag, "game_stat
   def game = foreignKey("game_fk", gameId, gameTable)(_.gameId)
 
   // Zugriff auf GameTable
-  def gameTable = TableQuery[GameTable]
+  def gameTable = TableQuery(GameTable)
 }

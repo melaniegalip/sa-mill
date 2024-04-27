@@ -21,6 +21,6 @@ object Mill {
 
     gui.main(Array())
 
-    // tui.run
+    // tui.runTUI
   }
 }

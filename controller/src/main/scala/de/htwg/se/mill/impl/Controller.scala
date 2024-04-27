@@ -36,9 +36,9 @@ import play.api.libs.json.{JsValue, Json}
 import java.io._
 
 val connectIP =
-  sys.env.getOrElse("FILEIO_SERVICE_HOST", "localhost").toString
+  sys.env.getOrElse("FILEIO_SERVICE_HOST", "0.0.0.0").toString
 val connectPort =
-  sys.env.getOrElse("FILEIO_SERVICE_PORT", 8080).toString.toInt
+  sys.env.getOrElse("FILEIO_SERVICE_PORT", 8081).toString.toInt
 
 class Controller @Inject() (private val board: BoardInterface)
     extends ControllerInterface {

@@ -16,15 +16,12 @@ import model.FlyingState
 import model.GameEvent
 import java.io.ByteArrayOutputStream
 import util.Messages
-import persistence.FileIOInterface
-import persistence.FileIOJson
 
 class TUISpec extends AnyWordSpec with Matchers {
   "A new TUI" when {
     val melanie = Player("Melanie", "🔴")
     val reyhan = Player("Reyhan", "🔵")
-    val fileIo: FileIOInterface = FileIOJson
-    val controller = Controller(Board.withSize().get, fileIo)
+    val controller = Controller(Board.withSize().get)
     controller.addFirstPlayer(melanie.name)
     controller.addSecondPlayer(reyhan.name)
     controller.newGame
@@ -264,7 +261,7 @@ class TUISpec extends AnyWordSpec with Matchers {
         controller.gameState.get.equals(gameState) should be(true)
       }
       "run and quit successfully" in {
-        val controller = Controller(Board.withSize().get, fileIo)
+        val controller = Controller(Board.withSize().get)
         val tui = TUI(controller)
         Console.withIn(
           new ByteArrayInputStream(("melanie\nreyhan\n111\nq").getBytes())

@@ -41,8 +41,6 @@ object FileIOAPI {
   val executionContext: ExecutionContextExecutor = system.executionContext
   given ExecutionContextExecutor = executionContext
 
-
-
   val route = concat(
     path("persistence") {
       get {
@@ -55,7 +53,12 @@ object FileIOAPI {
         onSuccess(db.load()) { gameStateOpt =>
           gameStateOpt match {
             case Some(gameStateJson) =>
-              complete(HttpEntity(ContentTypes.`application/json`, FileIOJson.load(gameStateJson)))
+              complete(
+                HttpEntity(
+                  ContentTypes.`application/json`,
+                  gameStateJson
+                )
+              )
             case None =>
               complete(StatusCodes.NotFound, "No game state found")
           }
@@ -69,9 +72,6 @@ object FileIOAPI {
             val db = SlickUserDAO()
             db.createTables()
             db.save(game)
-            FileIOJson.save(
-              game
-            )
             complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "Game saved"))
           }
         }
@@ -80,15 +80,16 @@ object FileIOAPI {
   )
 
   val connectIP =
-    sys.env.getOrElse("FILEIO_SERVICE_HOST", "localhost").toString
+    sys.env.getOrElse("FILEIO_SERVICE_HOST", "0.0.0.0").toString
   val connectPort =
-    sys.env.getOrElse("FILEIO_SERVICE_PORT", 8080).toString.toInt
+    sys.env.getOrElse("FILEIO_SERVICE_PORT", 8081).toString.toInt
   val bindingFuture = Http().newServerAt(connectIP, connectPort).bind(route)
 
   println(
-    s"Server now online. Please navigate to http://$connectIP:$connectPort/persistence\nPress RETURN to stop..."
+    s"Server now online. Please navigate to http://$connectIP:$connectPort/persistence\nPress q to stop..."
   )
-  StdIn.readLine() // let it run until user presses return
+
+  while (StdIn.readLine() != "q") {}
   bindingFuture
     .flatMap(_.unbind()) // trigger unbinding from the port
     .onComplete(_ => system.terminate()) // and shutdown when done
