@@ -2,7 +2,7 @@ package persistence
 
 import scala.concurrent.{Await, Future}
 
-trait UserDAO {
+trait DBDAO {
   def dropTables(): Future[Unit]
   def createTables(): Future[Unit]
   def save(game: String): Future[Int]

@@ -10,6 +10,8 @@ import play.api.libs.json._
 
 import akka.http.scaladsl.marshalling.Marshaller
 import akka.http.scaladsl.model.HttpEntity
+import scala.concurrent.duration.DurationInt
+
 import akka.http.scaladsl.unmarshalling.{FromEntityUnmarshaller, Unmarshaller}
 import akka.http.scaladsl.server.Directives._
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
@@ -18,8 +20,9 @@ import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success}
 
 import databaseComponent.Slick.*
+import scala.concurrent.Await
 
-object FileIOAPI {
+class FileIOAPI(db: DBDAO) {
 
   private val routes: String =
     """
@@ -49,7 +52,6 @@ object FileIOAPI {
     },
     path("persistence" / "load") {
       get {
-        val db = SlickUserDAO()
         onSuccess(db.load()) { gameStateOpt =>
           gameStateOpt match {
             case Some(gameStateJson) =>
@@ -69,9 +71,8 @@ object FileIOAPI {
       concat(
         post {
           entity(as[String]) { game =>
-            val db = SlickUserDAO()
-            db.createTables()
-            db.save(game)
+            Await.result(db.createTables(), 60.seconds)
+            Await.result(db.save(game), 60.seconds)
             complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "Game saved"))
           }
         }

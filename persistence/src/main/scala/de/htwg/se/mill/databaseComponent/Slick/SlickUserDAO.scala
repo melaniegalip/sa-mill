@@ -15,7 +15,7 @@ import play.api.libs.functional.syntax._
 
 import persistence.*
 
-class SlickUserDAO extends UserDAO {
+class SlickUserDAO extends DBDAO {
 
   private val databaseDB: String = sys.env.getOrElse("POSTGRES_DATABASE", "tbl")
   private val databaseUser: String =
@@ -25,7 +25,6 @@ class SlickUserDAO extends UserDAO {
   private val databasePort: String = sys.env.getOrElse("POSTGRES_PORT", "5432")
   private val databaseHost: String =
     sys.env.getOrElse("POSTGRES_HOST", "localhost")
-  // private val databaseHost: String = sys.env.getOrElse("MYSQL_HOST", "database")
   private val databaseUrl =
     s"jdbc:postgresql://$databaseHost:$databasePort/$databaseDB?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&autoReconnect=true"
 

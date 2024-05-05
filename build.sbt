@@ -133,7 +133,8 @@ lazy val persistence = project
         .cross(CrossVersion.for3Use2_13),
       "org.postgresql" % "postgresql" % "42.5.0",
       ("com.typesafe.play" %% "play-json" % playJsonVersion)
-        .cross(CrossVersion.for3Use2_13)
+        .cross(CrossVersion.for3Use2_13),
+      "org.mongodb.scala" %% "mongo-scala-driver" % "4.8.0" cross CrossVersion.for3Use2_13
     ) ++ commonLibraries
   )
   .enablePlugins(JavaAppPackaging)
