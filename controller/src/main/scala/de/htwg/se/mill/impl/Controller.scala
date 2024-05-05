@@ -8,12 +8,7 @@ import scala.util.{Try, Success, Failure}
 import model.WinStrategy
 import model.GameState
 import model.GameEvent
-import model.{
-  SettingState,
-  RemovingState,
-  MovingState,
-  FlyingState
-}
+import model.{SettingState, RemovingState, MovingState, FlyingState}
 import util.Event
 import model.FieldInterface
 import model.BoardInterface
@@ -21,7 +16,6 @@ import model.PlayerInterface
 import model.GameInterface
 import com.google.inject.Inject
 import com.google.inject.Guice
-import persistence.FileIOInterface
 import util.Messages
 
 import akka.actor.typed.ActorSystem
@@ -41,13 +35,18 @@ import play.api.libs.json.{JsValue, Json}
 
 import java.io._
 
+val connectIP =
+  sys.env.getOrElse("FILEIO_SERVICE_HOST", "0.0.0.0").toString
+val connectPort =
+  sys.env.getOrElse("FILEIO_SERVICE_PORT", 8081).toString.toInt
+
 class Controller @Inject() (private val board: BoardInterface)
     extends ControllerInterface {
   private val twoPlayers = new Array[PlayerInterface](2)
   private val winStrategy = WinStrategy.classicStrategy
   private var previousTurn: Option[Try[GameState]] = None
   private var undoCommand = new UndoCommand()
-  private val persistenceServer = "http://localhost:8080/persistence"
+  private val persistenceServer = s"http://$connectIP:$connectPort/persistence"
   var gameState: Option[GameState] = None
   var fromField: Option[FieldInterface] = None
 
@@ -188,35 +187,38 @@ class Controller @Inject() (private val board: BoardInterface)
     gameState.get.isInstanceOf[MovingState] || gameState.get
       .isInstanceOf[FlyingState]
 
-  
   def save: Unit = {
-    implicit val system:ActorSystem[Any] = ActorSystem(Behaviors.empty, "my-system")
+    implicit val system: ActorSystem[Any] =
+      ActorSystem(Behaviors.empty, "my-system")
 
     val executionContext: ExecutionContextExecutor = system.executionContext
     given ExecutionContextExecutor = executionContext
 
-    
     val save = Json.obj(
       "gameState" -> Json.toJson(previousTurn.get.get.toJson)
     )
 
     val responseFuture: Future[HttpResponse] = Http().singleRequest(
-        HttpRequest(
-          method = HttpMethods.POST,
-          uri = persistenceServer + "/save",
-          entity = HttpEntity(ContentTypes.`application/json`, Json.prettyPrint(save).toString)
+      HttpRequest(
+        method = HttpMethods.POST,
+        uri = persistenceServer + "/save",
+        entity = HttpEntity(
+          ContentTypes.`application/json`,
+          Json.prettyPrint(save).toString
         )
+      )
     )
   }
 
   def load: Unit = {
-    implicit val system:ActorSystem[Any] = ActorSystem(Behaviors.empty, "my-system")
+    implicit val system: ActorSystem[Any] =
+      ActorSystem(Behaviors.empty, "my-system")
 
     val executionContext: ExecutionContextExecutor = system.executionContext
     given ExecutionContextExecutor = executionContext
 
-    val responseFuture: Future[HttpResponse] = Http().singleRequest(
-      HttpRequest(uri = persistenceServer + "/load"))
+    val responseFuture: Future[HttpResponse] =
+      Http().singleRequest(HttpRequest(uri = persistenceServer + "/load"))
 
     responseFuture
       .onComplete {
@@ -238,7 +240,7 @@ class Controller @Inject() (private val board: BoardInterface)
         }
       }
   }
- 
+
   private def doTurn(turn: Try[GameState]): Option[Throwable] = {
     previousTurn = Some(turn)
     turn match {

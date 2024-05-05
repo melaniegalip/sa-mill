@@ -31,11 +31,11 @@ class TUI(val controller: ControllerInterface) extends Observer {
         )
     }
   }
-  def run: Unit = {
+  def runTUI: Unit = {
     val input = readLine()
     Platform.runLater(onInput(input))
     if (quit) return
-    run
+    runTUI
   }
 
   def onInput(

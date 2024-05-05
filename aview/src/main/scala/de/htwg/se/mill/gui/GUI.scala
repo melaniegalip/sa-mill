@@ -61,6 +61,9 @@ class GUI(val controller: ControllerInterface) extends JFXApp3 with Observer {
   override def start(): Unit = {
     stage = new JFXApp3.PrimaryStage {
       title = "Mill"
+      onCloseRequest = () => {
+        Platform.exit();
+      }
       scene = new Scene(800, 600) {
         onKeyPressed = (event: KeyEvent) => handleKeyPress(event)
         resizable = false
@@ -104,11 +107,11 @@ class GUI(val controller: ControllerInterface) extends JFXApp3 with Observer {
 
   def handleKeyPress(event: KeyEvent): Unit = {
     event.code match {
-      case KeyCode.Q => 
+      case KeyCode.Q =>
         controller.quit
-      case KeyCode.N => 
+      case KeyCode.N =>
         controller.newGame
-      case KeyCode.U => 
+      case KeyCode.U =>
         controller.undo
       case KeyCode.R =>
         controller.redo
