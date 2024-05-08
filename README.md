@@ -3,7 +3,6 @@
 
 # The Mill - Classic Board Game
 
-
 Mill is one of the oldest board games and known in Europe by different names: Nine Men Morris, Mühle, Molenspel and Merrelles.
 
 <img src="https://i.etsystatic.com/10392661/r/il/3bd19c/3379188715/il_1588xN.3379188715_gife.jpg" height="750" width="750" >
@@ -14,7 +13,6 @@ There are 2 players in the game. Each player has 9 pieces of a given color. Each
 There are 3 phases to the game:
 
 ### Phase 1: Placing the pieces onto the board
-
 
 The players take turns placing one piece at a time onto the board, onto the empty dots.
 During this phase each player tries to prevent the opponent from forming a mill. However, if a mill was formed anyway, then the player who formed a mill gets to remove one of the opponent’s pieces, of their choice, from the board. The piece removed has to be not in a mill itself. If all of the opponent’s pieces form a mill, then none of the opponent’s pieces can be removed.
@@ -32,7 +30,6 @@ When one of the players has been reduced down to 3 last pieces, phase 2 ends and
 In phase 3, the limitation of moving only to an adjacent dot is removed, and both players can move their pieces to any available dot, even if that requires skipping dots or jumping over other pieces.
 
 ## Goal
-
 
 The game ends when one of the players is reduced to two pieces, and cannot any longer form mills, or if a player has no legal moves to make, making their opponent the winner in either situation.
 
@@ -75,8 +72,17 @@ docker build -t mill:v1 .
 docker run -e DISPLAY=$ip:0 -v /tmp/.X11-unix:/tmp/.X11-unix -it mill:v1
 ```
 
-### Look at your database
+### Look at your slick database
 
 ```bash
 docker exec -it database psql -U postgres tbl
+```
+
+### Look at your mongodb database
+
+```bash
+docker exec -it mongo bash
+mongosh -u root -p mongo
+use tbl
+db.game.find()
 ```

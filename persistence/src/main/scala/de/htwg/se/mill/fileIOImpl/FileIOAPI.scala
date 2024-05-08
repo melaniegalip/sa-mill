@@ -22,7 +22,12 @@ import scala.util.{Failure, Success}
 import databaseComponent.Slick.*
 import scala.concurrent.Await
 
-class FileIOAPI(db: DBDAO) {
+import com.google.inject.Inject
+import com.google.inject.Guice
+
+import databaseComponent.MongoDB.*
+
+class FileIOAPI @Inject() (db: DBDAO) {
 
   private val routes: String =
     """
@@ -94,4 +99,5 @@ class FileIOAPI(db: DBDAO) {
   bindingFuture
     .flatMap(_.unbind()) // trigger unbinding from the port
     .onComplete(_ => system.terminate()) // and shutdown when done
+  db.dropTables()
 }

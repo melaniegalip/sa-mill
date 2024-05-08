@@ -32,7 +32,7 @@ services:
       - "8081:8081"
     container_name: persistence-container
     links:
-    #  - db
+      #  - db
       - mongo
     volumes:
       - ./persistence:/persistence

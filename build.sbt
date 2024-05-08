@@ -34,7 +34,7 @@ lazy val commonSettings = Seq(
 
 lazy val root = project
   .in(file("."))
-  .dependsOn(aview, controller, model)
+  .dependsOn(aview, controller, model, persistence)
   .aggregate(util, model, aview, controller, persistence)
   .settings(
     name := "Mill",
@@ -134,7 +134,11 @@ lazy val persistence = project
       "org.postgresql" % "postgresql" % "42.5.0",
       ("com.typesafe.play" %% "play-json" % playJsonVersion)
         .cross(CrossVersion.for3Use2_13),
-      "org.mongodb.scala" %% "mongo-scala-driver" % "4.8.0" cross CrossVersion.for3Use2_13
+      ("org.mongodb.scala" %% "mongo-scala-driver" % "4.8.0")
+        .cross(CrossVersion.for3Use2_13),
+      "com.google.inject.extensions" % "guice-assistedinject" % "5.1.0",
+      ("net.codingwell" %% "scala-guice" % "5.0.2")
+        .cross(CrossVersion.for3Use2_13)
     ) ++ commonLibraries
   )
   .enablePlugins(JavaAppPackaging)

@@ -4,15 +4,20 @@ import persistence.FileIOAPI
 import scala.util.{Try, Success, Failure}
 
 import databaseComponent.Slick.*
-import de.htwg.se.mill.databaseComponent.MongoDB.MongoDBDAO
+import databaseComponent.MongoDB.*
+
+import com.google.inject.Injector
+import com.google.inject.Guice
 
 object Persistence {
   // val db = SlickUserDAO()
-  val db = MongoDBDAO()
-  db.dropTables()
+  // val db = MongoDBDAO()
+  // db.dropTables()
 
   @main def main: Unit = {
-    Try(FileIOAPI(db)) match
+    val injector: Injector = Guice.createInjector(new PersistenceModule)
+    val fileIOAPI = injector.getInstance(classOf[FileIOAPI])
+    Try(fileIOAPI) match
       case Success(persistence) => {
         println("Persistance Rest Server is running!")
       }

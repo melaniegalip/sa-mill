@@ -1,4 +1,4 @@
-package de.htwg.se.mill.databaseComponent.MongoDB
+package databaseComponent.MongoDB
 import org.mongodb.scala.{
   Document,
   MongoClient,
