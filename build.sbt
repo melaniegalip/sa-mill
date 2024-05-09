@@ -2,7 +2,7 @@ import com.typesafe.sbt.packager.Keys.{dockerBaseImage, dockerExposedPorts}
 import com.typesafe.sbt.packager.docker._
 
 val scala3Version = "3.2.2"
-val scalafxVersion = "17.0.1-R26"
+val scalafxVersion = "18.0.1-R28"
 val playJsonVersion = "2.10.4"
 val akkaHttp = "10.5.0"
 val akkaActor = "2.8.0"
