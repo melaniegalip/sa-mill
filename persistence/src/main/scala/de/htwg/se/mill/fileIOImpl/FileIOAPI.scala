@@ -76,7 +76,7 @@ class FileIOAPI @Inject() (db: DBDAO) {
       concat(
         post {
           entity(as[String]) { game =>
-            Await.result(db.createTables(), 60.seconds)
+            Await.result(db.create(), 60.seconds)
             Await.result(db.save(game), 60.seconds)
             complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "Game saved"))
           }
@@ -99,5 +99,5 @@ class FileIOAPI @Inject() (db: DBDAO) {
   bindingFuture
     .flatMap(_.unbind()) // trigger unbinding from the port
     .onComplete(_ => system.terminate()) // and shutdown when done
-  db.dropTables()
+  db.delete()
 }

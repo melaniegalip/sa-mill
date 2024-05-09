@@ -65,5 +65,5 @@ services:
     environment:
       FILEIO_SERVICE_HOST: persistence-container
       FILEIO_SERVICE_PORT: 8081
-      DISPLAY: $DISPLAY
+      DISPLAY: ${DISPLAY:-host.docker.internal:0.0}
     tty: true
