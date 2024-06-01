@@ -16,8 +16,18 @@ import akka.http.javadsl.model.HttpMethod
 class PersistenceSpikeTest extends SimulationSkeleton {
 
   override val operations = List(
-    buildOperation("persistence save", "POST", "/persistence/save", ElFileBody("C:\\Users\\User\\sa-mill\\persistence\\src\\test\\scala\\de\\htwg\\se\\mill\\gatling\\example_bodies\\game.json")),
-    buildOperation("persistence load", "GET", "/persistence/load", StringBody("")),
+    buildOperation(
+      "persistence save",
+      "POST",
+      "/persistence/save",
+      ElFileBody("game.json")
+    ),
+    buildOperation(
+      "persistence load",
+      "GET",
+      "/persistence/load",
+      StringBody("")
+    )
   )
 
   override def executeOperations(): Unit = {
@@ -27,11 +37,11 @@ class PersistenceSpikeTest extends SimulationSkeleton {
 
     setUp(
       scn.inject(
-        //spike users 
+        // spike users
         rampUsers(10) during (10.second),
         atOnceUsers(300),
-        rampUsers(10) during (10.second),
-        )
+        rampUsers(10) during (10.second)
+      )
     ).protocols(httpProtocol)
   }
 

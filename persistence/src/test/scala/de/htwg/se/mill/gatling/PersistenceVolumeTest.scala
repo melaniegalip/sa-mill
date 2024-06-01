@@ -16,8 +16,18 @@ import akka.http.javadsl.model.HttpMethod
 class PersistenceVolumeTest extends SimulationSkeleton {
 
   override val operations = List(
-    buildOperation("persistence save", "POST", "/persistence/save", ElFileBody("C:\\Users\\User\\sa-mill\\persistence\\src\\test\\scala\\de\\htwg\\se\\mill\\gatling\\example_bodies\\game.json")),
-    buildOperation("persistence load", "GET", "/persistence/load", StringBody("")),
+    buildOperation(
+      "persistence save",
+      "POST",
+      "/persistence/save",
+      ElFileBody("game.json")
+    ),
+    buildOperation(
+      "persistence load",
+      "GET",
+      "/persistence/load",
+      StringBody("")
+    )
   )
 
   override def executeOperations(): Unit = {
@@ -26,20 +36,23 @@ class PersistenceVolumeTest extends SimulationSkeleton {
     var scn3 = buildScenario("Scenario 3")
 
     setUp(
-      scn.inject(
-        //ramp up users to 100 in 10 seconds
-        rampUsersPerSec(10) to 100 during (10.second)
-      ).andThen(
-        scn2.inject(
-          //hold 100 users for 10 seconds
-          constantUsersPerSec(100) during (10.second)
+      scn
+        .inject(
+          // ramp up users to 100 in 10 seconds
+          rampUsersPerSec(10) to 100 during (10.second)
         )
-      ).andThen(
-        scn3.inject(
-          //ramp down users to 0 in 10 seconds
-          rampUsersPerSec(100) to 0 during (10.second)
+        .andThen(
+          scn2.inject(
+            // hold 100 users for 10 seconds
+            constantUsersPerSec(100) during (10.second)
+          )
         )
-      )
+        .andThen(
+          scn3.inject(
+            // ramp down users to 0 in 10 seconds
+            rampUsersPerSec(100) to 0 during (10.second)
+          )
+        )
     ).protocols(httpProtocol)
   }
 

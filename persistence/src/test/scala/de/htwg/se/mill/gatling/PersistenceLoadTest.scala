@@ -16,8 +16,18 @@ import akka.http.javadsl.model.HttpMethod
 class PersistenceLoadTest extends SimulationSkeleton {
 
   override val operations = List(
-    buildOperation("persistence save", "POST", "/persistence/save", ElFileBody("C:\\Users\\User\\sa-mill\\persistence\\src\\test\\scala\\de\\htwg\\se\\mill\\gatling\\example_bodies\\game.json")),
-    buildOperation("persistence load", "GET", "/persistence/load", StringBody("")),
+    buildOperation(
+      "persistence save",
+      "POST",
+      "/persistence/save",
+      ElFileBody("game.json")
+    ),
+    buildOperation(
+      "persistence load",
+      "GET",
+      "/persistence/load",
+      StringBody("")
+    )
   )
 
   override def executeOperations(): Unit = {
@@ -26,11 +36,10 @@ class PersistenceLoadTest extends SimulationSkeleton {
     var scn3 = buildScenario("Scenario 3")
 
     setUp(
-      //load test with only one user requesting a normal amount of requests
-        scn.inject(
-          rampUsers(10) during (20.seconds)
-        )
-
+      // load test with only one user requesting a normal amount of requests
+      scn.inject(
+        rampUsers(10) during (20.seconds)
+      )
     ).protocols(httpProtocol)
   }
 
