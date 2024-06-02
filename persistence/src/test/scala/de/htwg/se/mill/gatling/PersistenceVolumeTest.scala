@@ -20,7 +20,7 @@ class PersistenceVolumeTest extends SimulationSkeleton {
       "persistence save",
       "POST",
       "/persistence/save",
-      ElFileBody("game.json")
+      ElFileBody("game_volume.json")
     ),
     buildOperation(
       "persistence load",

@@ -47,7 +47,6 @@ class MongoDBDAO extends DBDAO:
         println(exception)
         Future.failed(exception)
       case Success(value) =>
-        println(value)
         Future.successful(())
   }
   override def create(): Future[Unit] = {
@@ -59,7 +58,6 @@ class MongoDBDAO extends DBDAO:
         println(exception)
         Future.failed(exception)
       case Success(value) =>
-        println(value)
         Future.successful(())
   }
   override def save(game: String): Future[Int] = {
@@ -79,7 +77,6 @@ class MongoDBDAO extends DBDAO:
         println(s"$exception, $game")
         Future.failed(new IllegalArgumentException(exception))
       case Success(value) =>
-        println(value)
         Future.successful(1)
     }
   }
@@ -94,7 +91,6 @@ class MongoDBDAO extends DBDAO:
         println(s"$exception")
         Future.failed(exception)
       case Success(value) =>
-        println(value)
         Future.successful(Some(value.getJson()))
     }
   }

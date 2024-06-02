@@ -16,18 +16,20 @@ object Board {
 
     override def getField(x: Int, y: Int, ring: Int): Option[FieldInterface] = {
       for {
-      field <- fields.find(f => f.equals(
+        field <- fields.find(f =>
+          f.equals(
             Field(
               x,
               y,
               ring
             )
-          ))
-    } yield field
+          )
+        )
+      } yield field
 
-      getField(x,y,ring) match {
+      getField(x, y, ring) match {
         case Some(f) => Some(f)
-        case None => None
+        case None    => None
       }
     }
     override def equals(board: Any): Boolean = board match {
@@ -109,16 +111,22 @@ object Board {
         )
       )
 
-    val fields = (0 until size).flatMap { ring =>
-      (0 until size).flatMap { row =>
-        (0 until size).filterNot { col =>
-          row > 0 && row < size - 1 && col > 0 && col < size - 1
-        }.map(col => Field(col, row, ring))
+    val fields = (0 until size)
+      .to(LazyList)
+      .flatMap { ring =>
+        (0 until size).to(LazyList).flatMap { row =>
+          (0 until size)
+            .to(LazyList)
+            .filterNot { col =>
+              row > 0 && row < size - 1 && col > 0 && col < size - 1
+            }
+            .map(col => Field(col, row, ring))
+        }
       }
-    }.toList
+      .toList
 
     Success(
-      NewBoard(fields,size)
+      NewBoard(fields, size)
     )
   }
   def apply(fields: List[FieldInterface], size: Int): BoardInterface = {

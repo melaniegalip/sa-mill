@@ -85,7 +85,7 @@ class TUI(val controller: ControllerInterface) extends Observer {
           return
         }
 
-        val fields = input.split(" ").map(field => field.split(""))
+        val fields = input.split(" ").to(LazyList).map(field => field.split(""))
         val field = currentBoard.getField(
           fields(0)(0).toInt - 1,
           fields(0)(1).toInt - 1,
