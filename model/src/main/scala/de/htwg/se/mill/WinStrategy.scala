@@ -15,8 +15,10 @@ object WinStrategy {
     ) < game.board.size
   def firstMillStrategy(game: GameInterface) = 0
     .until(game.board.size)
+    .to(LazyList)
     .flatMap(j =>
       0.until(game.board.size)
+        .to(LazyList)
         .map(k => {
           val possibleMillOnRow = game.board.fields
             .count(field =>

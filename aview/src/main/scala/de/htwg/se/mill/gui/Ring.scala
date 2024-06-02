@@ -29,11 +29,14 @@ final case class Ring(
     )
   )
   columnConstraints = (0 until size)
+    .to(LazyList)
     .map(n => new ColumnConstraints { percentWidth = 100 })
   rowConstraints = (0 until size)
+    .to(LazyList)
     .map(n => new RowConstraints { percentHeight = 100 })
   children ++=
     fields
+      .to(LazyList)
       .filter(f => f.y == 0)
       .zipWithIndex
       .map((f, i) => {
@@ -62,6 +65,7 @@ final case class Ring(
   GridPane.setValignment(middleRightField, VPos.Center)
   children ++= Seq(middleLeftField, middleRightField)
   children ++= fields
+    .to(LazyList)
     .filter(f => f.y == size - 1)
     .zipWithIndex
     .map((f, i) => {

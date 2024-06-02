@@ -2,15 +2,29 @@ import com.typesafe.sbt.packager.Keys.{dockerBaseImage, dockerExposedPorts}
 import com.typesafe.sbt.packager.docker._
 
 val scala3Version = "3.2.2"
-val scalafxVersion = "17.0.1-R26"
+val scalafxVersion = "18.0.1-R28"
 val playJsonVersion = "2.10.4"
-val akkaHttp = "10.5.0"
-val akkaActor = "2.8.0"
+val akkaHttp = "10.5.3"
+val akkaActor = "2.8.5"
 
 lazy val commonLibraries = Seq(
   "org.scalactic" %% "scalactic" % "3.2.17",
   "org.scalatest" %% "scalatest" % "3.2.17" % "test",
   "ch.qos.logback" % "logback-classic" % "1.3.14"
+)
+
+val gatlingExclude = Seq(
+  ExclusionRule("com.typesafe.akka", "akka-actor_2.13"),
+  ExclusionRule("org.scala-lang.modules", "scala-java8-compat_2.13"),
+  ExclusionRule("com.typesafe.akka", "akka-slf4j_2.13")
+)
+
+val gatlingHigh = "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.11.3" % "test" excludeAll (gatlingExclude: _*)
+val gatlingTest = "io.gatling" % "gatling-test-framework" % "3.11.3" % "test" excludeAll (gatlingExclude: _*)
+
+lazy val gatlingDependencies = Seq(
+  gatlingHigh,
+  gatlingTest
 )
 
 lazy val commonSettings = Seq(
@@ -34,7 +48,7 @@ lazy val commonSettings = Seq(
 
 lazy val root = project
   .in(file("."))
-  .dependsOn(aview, controller, model)
+  .dependsOn(aview, controller, model, persistence)
   .aggregate(util, model, aview, controller, persistence)
   .settings(
     name := "Mill",
@@ -66,9 +80,9 @@ lazy val root = project
       "com.google.inject.extensions" % "guice-assistedinject" % "5.1.0",
       ("net.codingwell" %% "scala-guice" % "5.0.2")
         .cross(CrossVersion.for3Use2_13)
-    ) ++ commonLibraries
+    ) ++ commonLibraries ++ gatlingDependencies
   )
-  .enablePlugins(JavaAppPackaging)
+  .enablePlugins(JavaAppPackaging, GatlingPlugin)
 
 lazy val model = project
   .dependsOn(util)
@@ -134,7 +148,11 @@ lazy val persistence = project
       "org.postgresql" % "postgresql" % "42.5.0",
       ("com.typesafe.play" %% "play-json" % playJsonVersion)
         .cross(CrossVersion.for3Use2_13),
-      "org.mongodb.scala" %% "mongo-scala-driver" % "4.8.0" cross CrossVersion.for3Use2_13
-    ) ++ commonLibraries
+      ("org.mongodb.scala" %% "mongo-scala-driver" % "4.8.0")
+        .cross(CrossVersion.for3Use2_13),
+      "com.google.inject.extensions" % "guice-assistedinject" % "5.1.0",
+      ("net.codingwell" %% "scala-guice" % "5.0.2")
+        .cross(CrossVersion.for3Use2_13)
+    ) ++ commonLibraries ++ gatlingDependencies
   )
-  .enablePlugins(JavaAppPackaging)
+  .enablePlugins(JavaAppPackaging, GatlingPlugin)

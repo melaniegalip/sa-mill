@@ -52,6 +52,7 @@ final case class Board(
     )
   ).appendedAll(
     (0 until controller.gameState.get.game.board.size)
+      .to(LazyList)
       .map(n =>
         new Ring(
           controller.gameState.get.game.board.fields.filter(f => f.ring == n),

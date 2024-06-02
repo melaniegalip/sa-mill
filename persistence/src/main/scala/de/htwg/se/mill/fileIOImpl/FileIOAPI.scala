@@ -22,7 +22,12 @@ import scala.util.{Failure, Success}
 import databaseComponent.Slick.*
 import scala.concurrent.Await
 
-class FileIOAPI(db: DBDAO) {
+import com.google.inject.Inject
+import com.google.inject.Guice
+
+import databaseComponent.MongoDB.*
+
+class FileIOAPI @Inject() (db: DBDAO) {
 
   private val routes: String =
     """
@@ -71,7 +76,7 @@ class FileIOAPI(db: DBDAO) {
       concat(
         post {
           entity(as[String]) { game =>
-            Await.result(db.createTables(), 60.seconds)
+            Await.result(db.create(), 60.seconds)
             Await.result(db.save(game), 60.seconds)
             complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "Game saved"))
           }
@@ -94,4 +99,5 @@ class FileIOAPI(db: DBDAO) {
   bindingFuture
     .flatMap(_.unbind()) // trigger unbinding from the port
     .onComplete(_ => system.terminate()) // and shutdown when done
+  db.delete()
 }

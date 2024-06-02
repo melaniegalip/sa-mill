@@ -41,7 +41,7 @@ class SlickUserDAO extends DBDAO {
   val field = TableQuery(FieldTable)
   val gameState = TableQuery(GameStateTable)
 
-  override def createTables(): Future[Unit] = {
+  override def create(): Future[Unit] = {
 
     val createPlayerTableAction = player.schema.createIfNotExists
     val createBoardTableAction = board.schema.createIfNotExists
@@ -60,7 +60,7 @@ class SlickUserDAO extends DBDAO {
     database.run(combinedAction)
   }
 
-  override def dropTables(): Future[Unit] = {
+  override def delete(): Future[Unit] = {
     val dropGameStateTableAction = gameState.schema.dropIfExists
     val dropFieldTableAction = field.schema.dropIfExists
     val dropGameTableAction = game.schema.dropIfExists

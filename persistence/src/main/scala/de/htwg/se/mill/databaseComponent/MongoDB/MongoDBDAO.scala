@@ -1,4 +1,4 @@
-package de.htwg.se.mill.databaseComponent.MongoDB
+package databaseComponent.MongoDB
 import org.mongodb.scala.{
   Document,
   MongoClient,
@@ -39,7 +39,7 @@ class MongoDBDAO extends DBDAO:
   private val gameCollection: MongoCollection[JsonObject] =
     db.getCollection("game")
 
-  def dropTables(): Future[Unit] = {
+  override def delete(): Future[Unit] = {
     Try {
       Await.result(gameCollection.drop().head, 10.seconds)
     } match
@@ -47,10 +47,9 @@ class MongoDBDAO extends DBDAO:
         println(exception)
         Future.failed(exception)
       case Success(value) =>
-        println(value)
         Future.successful(())
   }
-  def createTables(): Future[Unit] = {
+  override def create(): Future[Unit] = {
     Try {
       Await.result(db.createCollection("game").head, 10.seconds)
       Await.result(db.listCollectionNames().head, 10.seconds)
@@ -59,10 +58,9 @@ class MongoDBDAO extends DBDAO:
         println(exception)
         Future.failed(exception)
       case Success(value) =>
-        println(value)
         Future.successful(())
   }
-  def save(game: String): Future[Int] = {
+  override def save(game: String): Future[Int] = {
     Try(
       Await.result(
         gameCollection
@@ -79,11 +77,10 @@ class MongoDBDAO extends DBDAO:
         println(s"$exception, $game")
         Future.failed(new IllegalArgumentException(exception))
       case Success(value) =>
-        println(value)
         Future.successful(1)
     }
   }
-  def load(): Future[Option[String]] = {
+  override def load(): Future[Option[String]] = {
     Try(
       Await.result(
         gameCollection.find().first().head(),
@@ -94,10 +91,9 @@ class MongoDBDAO extends DBDAO:
         println(s"$exception")
         Future.failed(exception)
       case Success(value) =>
-        println(value)
         Future.successful(Some(value.getJson()))
     }
   }
-  def closeDatabase(): Unit = {
+  override def closeDatabase(): Unit = {
     client.close()
   }
