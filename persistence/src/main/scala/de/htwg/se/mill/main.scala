@@ -10,10 +10,6 @@ import com.google.inject.Injector
 import com.google.inject.Guice
 
 object Persistence {
-  // val db = SlickUserDAO()
-  // val db = MongoDBDAO()
-  // db.dropTables()
-
   @main def main: Unit = {
     val injector: Injector = Guice.createInjector(new PersistenceModule)
     val fileIOAPI = injector.getInstance(classOf[FileIOAPI])

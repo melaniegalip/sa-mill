@@ -34,6 +34,7 @@ class FileIOAPI @Inject() (db: DBDAO) {
       Welcome to the REST Persistence API service!
       Available routes:
 
+        persistence/delete
         persistence/load
         persistence/save
 
@@ -53,6 +54,14 @@ class FileIOAPI @Inject() (db: DBDAO) {
     path("persistence") {
       get {
         complete(routes)
+      }
+    },
+    path("persistence" / "delete") {
+      post {
+        Await.result(db.delete(), 60.seconds)
+        complete(
+          HttpEntity(ContentTypes.`text/html(UTF-8)`, "Game deleted")
+        )
       }
     },
     path("persistence" / "load") {

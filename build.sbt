@@ -19,8 +19,10 @@ val gatlingExclude = Seq(
   ExclusionRule("com.typesafe.akka", "akka-slf4j_2.13")
 )
 
-val gatlingHigh = "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.11.3" % "test" excludeAll (gatlingExclude: _*)
-val gatlingTest = "io.gatling" % "gatling-test-framework" % "3.11.3" % "test" excludeAll (gatlingExclude: _*)
+val gatlingHigh =
+  "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.11.3" % "test" excludeAll (gatlingExclude: _*)
+val gatlingTest =
+  "io.gatling" % "gatling-test-framework" % "3.11.3" % "test" excludeAll (gatlingExclude: _*)
 
 lazy val gatlingDependencies = Seq(
   gatlingHigh,
