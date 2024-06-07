@@ -103,14 +103,14 @@ don't close the terminal. Open a new terminal
 
 ### start Kafka-Broker (in kafka_2.13-3.7.0 folder) (windows only)
 ```bash
-.\\bin\\windows\\kafka-server-start.bat ./config/server.properties
+.\\bin\\windows\\kafka-server-start.bat .\\config\\server.properties
 ```
 
 don't close this terminal either. Let it open
 
 now the kafka server is online
 
-now run the game
+run the game now
 
 ### start Kafta-Producer (in kafka_2.13-3.7.0 folder)
 ```bash
