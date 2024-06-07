@@ -102,6 +102,8 @@ zookeeper-server-start.bat ./config/zookeeper.properties
 kafka-server-start.bat ./config/server.properties
 ```
 
+run the game
+
 ### start Kafta-Producer
 ```bash
 kafka-console-producer.bat --broker-list localhost:9092 --topic your-topic
