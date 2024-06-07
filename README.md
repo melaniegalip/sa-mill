@@ -111,6 +111,6 @@ kafka-console-producer.bat --broker-list localhost:9092 --topic your-topic
 
 ### start Kafta-Consumer
 ```bash
-kafka-console-consumer.bat --topic your_topic --bootstrap-server localhost:9092 --from-beginning
+kafka-console-consumer.bat --topic your-topic --bootstrap-server localhost:9092 --from-beginning
 ```
 ##
