@@ -119,10 +119,12 @@ class GUI(val controller: ControllerInterface) extends JFXApp3 with Observer {
   }
 
   def handleStreamData(data: String): Unit = {
-    new Alert(AlertType.Information) {
-      initOwner(stage)
-      headerText = data
-    }.showAndWait()
+    Platform.runLater {
+      new Alert(AlertType.Information) {
+        initOwner(stage)
+        headerText = data
+      }.showAndWait()
+    }
   }
 
   def onAction: (field: FieldInterface) => Unit = (field: FieldInterface) => {
@@ -150,8 +152,11 @@ class GUI(val controller: ControllerInterface) extends JFXApp3 with Observer {
       }
     }
     e match
-      case Event.QUIT => Platform.exit()
-      case Event.PLAY => start()
+      case Event.QUIT =>
+        system.terminate()
+        Platform.exit();
+      case Event.PLAY => 
+        start()
   }
 
   override def start(): Unit = {
@@ -201,8 +206,10 @@ class GUI(val controller: ControllerInterface) extends JFXApp3 with Observer {
       }
     }
     if (isKafkaAvailable("localhost", 9092)) {
+      println("streams using kafka is running")
       runStreamKafka()
     } else {
+      println("streams is running")
       runStreamNormal()
     }
   }

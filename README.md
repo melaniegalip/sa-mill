@@ -92,16 +92,18 @@ db.game.find()
 ### download kafka
 - website-link: [Kafka](https://kafka.apache.org/downloads)
 
+use the terminal to navigate to the folder below
+
 ### start Zookeeper (in kafka_2.13-3.7.0 folder) (windows only)
 ```bash
-./bin/windows/zookeeper-server-start.bat ./config/zookeeper.properties
+.\\bin\\windows\\zookeeper-server-start.bat .\\config\\zookeeper.properties
 ```
 
 don't close the terminal. Open a new terminal
 
 ### start Kafka-Broker (in kafka_2.13-3.7.0 folder) (windows only)
 ```bash
-./bin/windows/kafka-server-start.bat ./config/server.properties
+.\\bin\\windows\\kafka-server-start.bat ./config/server.properties
 ```
 
 don't close this terminal either. Let it open
@@ -110,13 +112,13 @@ now the kafka server is online
 
 now run the game
 
-### start Kafta-Producer (windows only)
+### start Kafta-Producer (in kafka_2.13-3.7.0 folder)
 ```bash
-kafka-console-producer.bat --broker-list localhost:9092 --topic your-topic
+.\\bin\\windows\\kafka-console-producer.bat --broker-list localhost:9092 --topic your-topic
 ```
 
-### start Kafta-Consumer (windows only)
+### start Kafta-Consumer (in kafka_2.13-3.7.0 folder)
 ```bash
-kafka-console-consumer.bat --topic your-topic --bootstrap-server localhost:9092 --from-beginning
+.\\bin/windows\\kafka-console-consumer.bat --topic your-topic --bootstrap-server localhost:9092 --from-beginning
 ```
 ##
