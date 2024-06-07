@@ -90,7 +90,7 @@ db.game.find()
 # start kafka server
 
 ### download kafka
-- website-link: [Kafta](https://kafka.apache.org/downloads)
+- website-link: [Kafka](https://kafka.apache.org/downloads)
 
 ### start Zookeeper (in /bin/ directory)
 ```bash
