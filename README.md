@@ -86,3 +86,18 @@ mongosh -u root -p mongo
 use tbl
 db.game.find()
 ```
+
+### start kafka server
+
+# start Zookeeper (in /bin/ directory)
+zookeeper-server-start.bat ..\config\zookeeper.properties
+
+# start Kafka-Broker (in /bin/ directory)
+kafka-server-start.bat ..\config\server.properties
+
+# start Kafta-Producer
+kafka-console-producer.bat --broker-list localhost:9092 --topic your-topic
+
+# start Kafta-Consumer
+kafka-console-consumer.bat --topic your_topic --bootstrap-server localhost:9092 --from-beginning
+##

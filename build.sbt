@@ -130,7 +130,9 @@ lazy val aview = project
     commonSettings,
     libraryDependencies ++= Seq(
       "org.scalafx" %% "scalafx" % scalafxVersion,
-      "com.typesafe.akka" %% "akka-stream" % "2.6.20"
+      "com.typesafe.akka" %% "akka-stream" % "2.6.20",
+      "com.typesafe.akka" %% "akka-stream-kafka" % "4.0.2",
+      "org.apache.kafka" % "kafka-clients" % "2.6.0"
     ) ++ commonLibraries
   )
 
