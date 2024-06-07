@@ -41,40 +41,45 @@ import akka.kafka.scaladsl.{Producer, Consumer}
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.{StringSerializer, StringDeserializer}
 
+import java.net.Socket
+
 class GUI(val controller: ControllerInterface) extends JFXApp3 with Observer {
   controller.add(this)
 
   implicit val system: ActorSystem = ActorSystem("MillSystem")
   implicit val materializer: Materializer = Materializer(system)
 
-  // Kafka producer settings
+  def isKafkaAvailable(host: String, port: Int): Boolean = {
+    try {
+      val socket = new Socket(host, port)
+      socket.close()
+      true
+    } catch {
+      case _: Exception => false
+    }
+  }
+
   val producerSettings = ProducerSettings(system, new StringSerializer, new StringSerializer)
     .withBootstrapServers("localhost:9092")
 
-  // Kafka consumer settings
   val consumerSettings = ConsumerSettings(system, new StringDeserializer, new StringDeserializer)
     .withBootstrapServers("localhost:9092")
     .withGroupId("group1")
 
-  def runStream(): Unit = {
-    // Producer source
+  def runStreamKafka(): Unit = {
     val source = Source.actorRef[String](bufferSize = 100, overflowStrategy = akka.stream.OverflowStrategy.dropHead)
     val (actorRef, publisher) = source.toMat(Sink.asPublisher(fanout = false))(akka.stream.scaladsl.Keep.both).run()
 
-    // Kafka producer sink
     val kafkaSink = Producer.plainSink(producerSettings)
 
-    // Connect the source to the Kafka sink
     Source.fromPublisher(publisher)
       .map { keyPress =>
         new ProducerRecord[String, String]("your-topic", "key", keyPress)
       }
       .runWith(kafkaSink)
 
-    // Kafka consumer source
     val kafkaSource = Consumer.plainSource(consumerSettings, Subscriptions.topics("your-topic"))
 
-    // Process incoming messages
     val flow = Flow[String].map { keyPress =>
       s"Key Pressed: $keyPress"
     }
@@ -89,6 +94,26 @@ class GUI(val controller: ControllerInterface) extends JFXApp3 with Observer {
       .map(record => record.value())
       .via(flow)
       .runWith(sink)
+
+    stage.scene().onKeyPressed = handleKeyPress(actorRef) _
+  }
+
+  def runStreamNormal(): Unit = {
+    val source = Source.actorRef[String](bufferSize = 100, overflowStrategy = akka.stream.OverflowStrategy.dropHead)
+
+    val (actorRef, publisher) = source.toMat(Sink.asPublisher(fanout = false))(akka.stream.scaladsl.Keep.both).run()
+
+    val flow = Flow[String].map { keyPress =>
+      s"Key Pressed: $keyPress"
+    }
+
+    val sink = Sink.foreach[String] { data =>
+      Platform.runLater {
+        handleStreamData(data)
+      }
+    }
+
+    Source.fromPublisher(publisher).via(flow).runWith(sink)
 
     stage.scene().onKeyPressed = handleKeyPress(actorRef) _
   }
@@ -175,7 +200,11 @@ class GUI(val controller: ControllerInterface) extends JFXApp3 with Observer {
         }
       }
     }
-    runStream()
+    if (isKafkaAvailable("localhost", 9092)) {
+      runStreamKafka()
+    } else {
+      runStreamNormal()
+    }
   }
 
   def handleKeyPress(actorRef: akka.actor.ActorRef)(event: KeyEvent): Unit = {
