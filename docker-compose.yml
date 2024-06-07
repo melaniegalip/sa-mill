@@ -1,28 +1,28 @@
 version: "3.9"
 services:
-  db:
-    image: postgres
-    container_name: database
-    restart: unless-stopped
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_DB: tbl
-      POSTGRES_HOST: database
-      POSTGRES_PORT: 5432
-    ports:
-      - "5432:5432"
-
-  # mongo:
-  #   image: mongo
+  # db:
+  #   image: postgres
+  #   container_name: database
   #   restart: unless-stopped
-  #   container_name: mongo
-  #   ports:
-  #     - "27017:27017"
   #   environment:
-  #     MONGO_INITDB_ROOT_USERNAME: root
-  #     MONGO_INITDB_ROOT_PASSWORD: mongo
-  #     MONGO_INITDB_DATABASE: tbl
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_DB: tbl
+  #     POSTGRES_HOST: database
+  #     POSTGRES_PORT: 5432
+  #   ports:
+  #     - "5432:5432"
+
+  mongo:
+    image: mongo
+    restart: unless-stopped
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: mongo
+      MONGO_INITDB_DATABASE: tbl
 
   persistence:
     image: mill-persistence:0.1.0-SNAPSHOT
@@ -30,8 +30,8 @@ services:
       - "8081:8081"
     container_name: persistence-container
     links:
-      - db
-      # - mongo
+      # - db
+      - mongo
     volumes:
       - ./persistence:/persistence
     environment:

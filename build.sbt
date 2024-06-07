@@ -82,9 +82,9 @@ lazy val root = project
       "com.google.inject.extensions" % "guice-assistedinject" % "5.1.0",
       ("net.codingwell" %% "scala-guice" % "5.0.2")
         .cross(CrossVersion.for3Use2_13)
-    ) ++ commonLibraries ++ gatlingDependencies
+    ) ++ commonLibraries
   )
-  .enablePlugins(JavaAppPackaging, GatlingPlugin)
+  .enablePlugins(JavaAppPackaging)
 
 lazy val model = project
   .dependsOn(util)
@@ -129,7 +129,8 @@ lazy val aview = project
     name := "Mill-aview",
     commonSettings,
     libraryDependencies ++= Seq(
-      "org.scalafx" %% "scalafx" % scalafxVersion
+      "org.scalafx" %% "scalafx" % scalafxVersion,
+      "com.typesafe.akka" %% "akka-stream" % "2.6.20"
     ) ++ commonLibraries
   )
 
@@ -155,6 +156,6 @@ lazy val persistence = project
       "com.google.inject.extensions" % "guice-assistedinject" % "5.1.0",
       ("net.codingwell" %% "scala-guice" % "5.0.2")
         .cross(CrossVersion.for3Use2_13)
-    ) ++ commonLibraries ++ gatlingDependencies
+    ) ++ commonLibraries
   )
-  .enablePlugins(JavaAppPackaging, GatlingPlugin)
+  .enablePlugins(JavaAppPackaging)

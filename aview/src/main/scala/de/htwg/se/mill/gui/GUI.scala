@@ -27,8 +27,47 @@ import util.Messages
 import controller.ControllerInterface
 import scalafx.scene.input.{KeyEvent, KeyCode}
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.util.{Success, Failure}
+import scala.concurrent.duration._
+
+import akka.actor.ActorSystem
+import akka.stream.scaladsl.{Sink, Source, Flow}
+import akka.stream.{ActorMaterializer, Materializer}
+
 class GUI(val controller: ControllerInterface) extends JFXApp3 with Observer {
   controller.add(this)
+
+  implicit val system: ActorSystem = ActorSystem("MillSystem")
+  implicit val materializer: Materializer = Materializer(system)
+
+  def runStream(): Unit = {
+    val source = Source.actorRef[String](bufferSize = 100, overflowStrategy = akka.stream.OverflowStrategy.dropHead)
+    
+    val (actorRef, publisher) = source.toMat(Sink.asPublisher(fanout = false))(akka.stream.scaladsl.Keep.both).run()
+
+    val flow = Flow[String].map { keyPress =>
+      s"Key Pressed: $keyPress"
+    }
+
+    val sink = Sink.foreach[String] { data =>
+      Platform.runLater {
+        handleStreamData(data)
+      }
+    }
+
+    Source.fromPublisher(publisher).via(flow).runWith(sink)
+
+    stage.scene().onKeyPressed = handleKeyPress(actorRef) _
+  }
+
+  def handleStreamData(data: String): Unit = {
+    new Alert(AlertType.Information) {
+      initOwner(stage)
+      headerText = data
+    }.showAndWait()
+  }
 
   def onAction: (field: FieldInterface) => Unit = (field: FieldInterface) => {
     if (controller.isSetting) {
@@ -44,6 +83,7 @@ class GUI(val controller: ControllerInterface) extends JFXApp3 with Observer {
       }
     }
   }
+
   override def update(message: Option[String], e: Event): Unit = {
     if (message.isDefined) {
       Platform.runLater {
@@ -59,13 +99,14 @@ class GUI(val controller: ControllerInterface) extends JFXApp3 with Observer {
   }
 
   override def start(): Unit = {
+    
     stage = new JFXApp3.PrimaryStage {
       title = "Mill"
       onCloseRequest = () => {
+        system.terminate()
         Platform.exit();
       }
       scene = new Scene(800, 600) {
-        onKeyPressed = (event: KeyEvent) => handleKeyPress(event)
         resizable = false
         root = {
           if (controller.gameState.isEmpty) {
@@ -103,9 +144,11 @@ class GUI(val controller: ControllerInterface) extends JFXApp3 with Observer {
         }
       }
     }
+    runStream()
   }
 
-  def handleKeyPress(event: KeyEvent): Unit = {
+  def handleKeyPress(actorRef: akka.actor.ActorRef)(event: KeyEvent): Unit = {
+    actorRef ! event.code.toString
     event.code match {
       case KeyCode.Q =>
         controller.quit
