@@ -74,11 +74,11 @@ class GUI(val controller: ControllerInterface) extends JFXApp3 with Observer {
 
     Source.fromPublisher(publisher)
       .map { keyPress =>
-        new ProducerRecord[String, String]("your-topic", "key", keyPress)
+        new ProducerRecord[String, String]("keyboard_inputs", "key", keyPress)
       }
       .runWith(kafkaSink)
 
-    val kafkaSource = Consumer.plainSource(consumerSettings, Subscriptions.topics("your-topic"))
+    val kafkaSource = Consumer.plainSource(consumerSettings, Subscriptions.topics("keyboard_inputs"))
 
     val flow = Flow[String].map { keyPress =>
       s"Key Pressed: $keyPress"
@@ -119,12 +119,7 @@ class GUI(val controller: ControllerInterface) extends JFXApp3 with Observer {
   }
 
   def handleStreamData(data: String): Unit = {
-    Platform.runLater {
-      new Alert(AlertType.Information) {
-        initOwner(stage)
-        headerText = data
-      }.showAndWait()
-    }
+    println(data);
   }
 
   def onAction: (field: FieldInterface) => Unit = (field: FieldInterface) => {

@@ -122,3 +122,28 @@ run the game now
 .\\bin\\windows\\kafka-console-consumer.bat --topic your-topic --bootstrap-server localhost:9092 --from-beginning
 ```
 ##
+
+### Kafka Server on Docker
+
+run these commands:
+
+```bash
+git clone https://github.com/simplesteph/kafka-stack-docker-compose.git
+```
+```bash
+cd cd kafka-stack-docker-compose/
+```
+```bash
+docker-compose -f zk-single-kafka-single.yml up
+```
+
+### Kafka-Producer
+```bash
+docker exec -it kafka1 kafka-console-producer --broker-list localhost:9092 --topic keyboard_inputs
+```
+
+### start Kafka-Consumer
+```bash
+docker exec -it kafka1 kafka-console-consumer --topic keyboard_inputs --bootstrap-server localhost:9092 --from-beginning
+```
+
