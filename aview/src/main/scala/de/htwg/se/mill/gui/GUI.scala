@@ -49,6 +49,16 @@ class GUI(val controller: ControllerInterface) extends JFXApp3 with Observer {
   implicit val system: ActorSystem = ActorSystem("MillSystem")
   implicit val materializer: Materializer = Materializer(system)
 
+  val connection =
+    sys.env.getOrElse("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092").toString
+
+  val producerSettings = ProducerSettings(system, new StringSerializer, new StringSerializer)
+    .withBootstrapServers(connection)
+
+  val consumerSettings = ConsumerSettings(system, new StringDeserializer, new StringDeserializer)
+    .withBootstrapServers(connection)
+    .withGroupId("group1")
+
   def isKafkaAvailable(host: String, port: Int): Boolean = {
     try {
       val socket = new Socket(host, port)
@@ -59,12 +69,10 @@ class GUI(val controller: ControllerInterface) extends JFXApp3 with Observer {
     }
   }
 
-  val producerSettings = ProducerSettings(system, new StringSerializer, new StringSerializer)
-    .withBootstrapServers("localhost:9092")
-
-  val consumerSettings = ConsumerSettings(system, new StringDeserializer, new StringDeserializer)
-    .withBootstrapServers("localhost:9092")
-    .withGroupId("group1")
+  def isKafkaInDocker: Boolean = {
+    val kafkaInDocker = sys.env.getOrElse("KAFKA_IN_DOCKER", "false")
+    kafkaInDocker.toBoolean
+  }
 
   def runStreamKafka(): Unit = {
     val source = Source.actorRef[String](bufferSize = 100, overflowStrategy = akka.stream.OverflowStrategy.dropHead)
@@ -200,11 +208,9 @@ class GUI(val controller: ControllerInterface) extends JFXApp3 with Observer {
         }
       }
     }
-    if (isKafkaAvailable("localhost", 9092)) {
-      println("streams using kafka is running")
+    if (isKafkaAvailable("localhost", 9092) || isKafkaInDocker) {
       runStreamKafka()
     } else {
-      println("streams is running")
       runStreamNormal()
     }
   }

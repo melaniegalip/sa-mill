@@ -95,7 +95,7 @@ class FileIOAPI @Inject() (db: DBDAO) {
   )
 
   val connectIP =
-    sys.env.getOrElse("FILEIO_SERVICE_HOST", "0.0.0.0").toString
+    sys.env.getOrElse("FILEIO_SERVICE_HOST", "localhost").toString
   val connectPort =
     sys.env.getOrElse("FILEIO_SERVICE_PORT", 8081).toString.toInt
   val bindingFuture = Http().newServerAt(connectIP, connectPort).bind(route)

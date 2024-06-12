@@ -148,8 +148,7 @@ lazy val persistence = project
       "com.typesafe.akka" %% "akka-actor-typed" % akkaActor,
       "com.typesafe.akka" %% "akka-stream" % akkaActor,
       "com.typesafe.akka" %% "akka-http" % akkaHttp,
-      ("com.typesafe.slick" %% "slick" % "3.5.1")
-        .cross(CrossVersion.for3Use2_13),
+      "com.typesafe.slick" %% "slick" % "3.5.1",
       "org.postgresql" % "postgresql" % "42.5.0",
       ("com.typesafe.play" %% "play-json" % playJsonVersion)
         .cross(CrossVersion.for3Use2_13),
