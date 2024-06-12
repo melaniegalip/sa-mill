@@ -119,6 +119,6 @@ run the game now
 
 ### start Kafta-Consumer (in kafka_2.13-3.7.0 folder)
 ```bash
-.\\bin/windows\\kafka-console-consumer.bat --topic your-topic --bootstrap-server localhost:9092 --from-beginning
+.\\bin\\windows\\kafka-console-consumer.bat --topic your-topic --bootstrap-server localhost:9092 --from-beginning
 ```
 ##
