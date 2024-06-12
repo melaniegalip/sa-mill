@@ -127,8 +127,13 @@ run the game now
 
 run these commands:
 
+```bash
 sbt docker:publishLocal
+```
+
+```bash
 docker-compose up -d --build
+```
 
 ### Kafka-Producer
 ```bash
